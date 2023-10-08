@@ -4,8 +4,8 @@
 
 # 有哪些组件？
 目前包括如下：
- - rocketmq （阿里云 ， apche开源）
- - rabbitmq （开源） 2021-02-10 增加
+ - rocketmq
+ - rabbitmq
 
 # 消息队列组件使用场景
 例如常见场景：
@@ -211,6 +211,8 @@ public class MyMessageListenerService2 implements TopicListener {
 rabbitmq 订阅关系一致性和rocketmq保持一致，详细信息请查看阿里云官网文档：
 https://help.aliyun.com/document_detail/43523.html?spm=a2c4g.11186623.6.731.30093227P1Qhed
 
+
+
 # 底层采用rocketmq
 
 pom.xml 文件引入如下配置
@@ -302,8 +304,6 @@ https://help.aliyun.com/document_detail/29548.html?spm=a2c4g.11186623.6.598.62ca
 事务消息： 消息队列 RocketMQ 版提供类似 X/Open XA 的分布式事务功能，通过消息队列 RocketMQ 版事务消息，能达到分布式事务的最终一致。
 
 
-
-
 # 针对事务消息，必须有一个本地事务执行器，为了执行本地事务和消息的回查
 
 ```java
@@ -386,8 +386,6 @@ import com.guzt.starter.mq.pojo.Message;
 
 /**
  * MQ消费者,尝试了最大次数后失败时的处理者
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 public interface RetryConsumFailHandler {
 
@@ -412,8 +410,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * MQ消费者,尝试了最大次数后失败时的处理者
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 public class DefaultRetryConsumFailHandler implements RetryConsumFailHandler {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
