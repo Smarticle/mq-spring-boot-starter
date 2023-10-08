@@ -2,13 +2,11 @@ package com.guzt.starter.mq.pojo;
 
 /**
  * 通知MQ服务器，本地事务执行结果.
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
- */
+ **/
 public enum LocalTransactionStatus {
 
     /**
-     * 提交了
+     * 已提交
      */
     COMMIT,
 
@@ -18,7 +16,7 @@ public enum LocalTransactionStatus {
     ROLLBACK,
 
     /**
-     * 暂不清楚，待mq服务器再次检查
+     * 未知，待MQ服务器再次检查
      */
     UNKNOW,
 }

@@ -26,8 +26,6 @@ import java.util.concurrent.TimeoutException;
 /**
  * 开源RabbitMq推送消息到MQ服务端
  * 发布（pub）模式
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 @SuppressWarnings("unused")
 public class AmqpXaRabbitMqPublisher implements XaTopicPublisher {
@@ -195,7 +193,7 @@ public class AmqpXaRabbitMqPublisher implements XaTopicPublisher {
             }
         } else if (PublishType.PUBLISH_FAIL_RETRY.getValue().equals(publishType)) {
             topicMessage.setCurrentRetyPubishCount(topicMessage.getCurrentRetyPubishCount() + 1);
-        } else if (PublishType.CONSUM_FAIL_RETRY.getValue().equals(publishType)) {
+        } else if (PublishType.CONSUME_FAIL_RETRY.getValue().equals(publishType)) {
             topicMessage.setCurrentRetyConsumCount(topicMessage.getCurrentRetyConsumCount() + 1);
         }
 

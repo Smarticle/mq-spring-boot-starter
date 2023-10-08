@@ -19,8 +19,6 @@ import java.util.Properties;
 
 /**
  * ApacheRocketMq 订阅消息
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 @SuppressWarnings("unused")
 public class ApacheSimpleRocketMqSubscriber implements TopicSubscriber {

@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * MQ消费者,尝试了最大次数后失败时的处理者
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 public class DefaultRetryConsumFailHandler implements RetryConsumFailHandler {
     private Logger logger = LoggerFactory.getLogger(this.getClass());

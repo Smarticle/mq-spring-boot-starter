@@ -9,8 +9,6 @@ import java.util.List;
 
 /**
  * 阿里云OSS配置文件
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 @ConfigurationProperties(prefix = "guzt.mq.apache.rocketmq")
 public class ApacheRocketMqProperties extends BaseProperties {

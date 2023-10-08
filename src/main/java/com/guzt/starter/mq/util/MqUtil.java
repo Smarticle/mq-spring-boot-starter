@@ -13,8 +13,6 @@ import static java.util.stream.Collectors.groupingBy;
 
 /**
  * 工具类
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 public class MqUtil {
 

@@ -20,7 +20,7 @@ public enum PublishType {
     /**
      * 消费失败重新发送
      */
-    CONSUM_FAIL_RETRY("CONSUM_FAIL_RETRY");
+    CONSUME_FAIL_RETRY("CONSUME_FAIL_RETRY");
 
     private String value;
 

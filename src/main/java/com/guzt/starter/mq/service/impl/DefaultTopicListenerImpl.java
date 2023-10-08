@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * TopicListener 的默认实现，主要用于容错
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 public class DefaultTopicListenerImpl implements TopicListener {
     private Logger logger = LoggerFactory.getLogger(this.getClass());

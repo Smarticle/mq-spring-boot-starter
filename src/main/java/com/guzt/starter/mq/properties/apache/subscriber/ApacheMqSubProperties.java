@@ -4,8 +4,6 @@ import com.guzt.starter.mq.properties.BaseSubProperties;
 
 /**
  * 消息消费者配置
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 public class ApacheMqSubProperties extends BaseSubProperties {
 

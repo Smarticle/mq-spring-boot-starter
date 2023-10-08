@@ -3,7 +3,7 @@ package com.guzt.starter.mq.pojo;
 /**
  * 消费消息的返回结果
  *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
+ * @author liuyang
  */
 public enum MessageStatus {
     /**

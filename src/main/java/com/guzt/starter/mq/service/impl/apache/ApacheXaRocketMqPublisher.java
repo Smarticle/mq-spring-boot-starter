@@ -16,8 +16,6 @@ import org.springframework.util.StringUtils;
 /**
  * ApacheRocketMq推送消息到MQ服务端
  * 发布（pub）模式
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 @SuppressWarnings("unused")
 public class ApacheXaRocketMqPublisher implements XaTopicPublisher {

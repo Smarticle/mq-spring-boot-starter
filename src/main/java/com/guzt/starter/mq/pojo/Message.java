@@ -3,37 +3,30 @@ package com.guzt.starter.mq.pojo;
 import java.io.Serializable;
 
 /**
- * 公共抽象消息体 Message
+ * 公共抽象消息体
  *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
+ * @author liuyang
  */
 public interface Message extends Serializable {
 
     /**
      * 获得消息体ID
-     * @return String
      */
     String getMessageId();
 
 
     /**
      * 设置消息体ID
-     *
-     * @param messageId 消息唯一id
      */
     void setMessageId(String messageId);
 
     /**
      * 获得消息体
-     *
-     * @return byte[]
      */
     byte[] getMessageBody();
 
     /**
      * 设置消息体
-     *
-     * @param messageBody 消息体 byte[]
      */
     void setMessageBody(byte[] messageBody);
 

@@ -2,8 +2,6 @@ package com.guzt.starter.mq.properties;
 
 /**
  * 基础OSS配置文件
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 public class BaseProperties {
 

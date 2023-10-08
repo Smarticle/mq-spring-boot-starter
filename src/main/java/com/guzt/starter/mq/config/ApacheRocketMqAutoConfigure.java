@@ -19,11 +19,8 @@ import com.guzt.starter.mq.service.impl.apache.ApacheXaRocketMqPublisher;
 import com.guzt.starter.mq.util.BeanArgBuilder;
 import com.guzt.starter.mq.util.BeanRegistrarUtil;
 import com.guzt.starter.mq.util.MqUtil;
-import org.apache.rocketmq.acl.common.AclClientRPCHook;
-import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.ClientConfig;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
-import org.apache.rocketmq.client.consumer.rebalance.AllocateMessageQueueAveragely;
 import org.apache.rocketmq.client.hook.SendMessageContext;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.LocalTransactionState;
@@ -31,7 +28,6 @@ import org.apache.rocketmq.client.producer.TransactionListener;
 import org.apache.rocketmq.client.producer.TransactionMQProducer;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.apache.rocketmq.remoting.RPCHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -54,9 +50,9 @@ import java.util.Properties;
 import java.util.concurrent.*;
 
 /**
- * 开源Rocketmq核心配置类
+ * RocketMQ 配置类
  *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
+ * @author liuyang
  */
 @Configuration
 @ConditionalOnClass({SendMessageContext.class})
@@ -127,7 +123,7 @@ public class ApacheRocketMqAutoConfigure implements InitializingBean {
             // 事务消息检查设置
             if (StringUtils.hasText(pubItem.getMessageType())
                     && pubItem.getMessageType().toUpperCase().equals(MessageType.TRANSACTION.getValue())) {
-                producer = new TransactionMQProducer(pubItem.getGroupId(), getAclRpcHook());
+                producer = new TransactionMQProducer(pubItem.getGroupId());
                 ExecutorService executorService = new ThreadPoolExecutor(
                         pubItem.getCheckThreadPoolMinSize(),
                         pubItem.getCheckThreadPoolMaxSize(),
@@ -152,7 +148,7 @@ public class ApacheRocketMqAutoConfigure implements InitializingBean {
                     }
                 });
             } else {
-                producer = new DefaultMQProducer(pubItem.getGroupId(), getAclRpcHook());
+                producer = new DefaultMQProducer(pubItem.getGroupId());
             }
             // 公共配置
             setCommonConfig(producer);
@@ -215,7 +211,7 @@ public class ApacheRocketMqAutoConfigure implements InitializingBean {
         Map<String, List<TopicListener>> listenerMapBySubBeanName = MqUtil.topicListenerGroupBySubBean(listenerMap);
 
         for (ApacheMqSubProperties subItem : properties) {
-            DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(subItem.getGroupId(), getAclRpcHook(), new AllocateMessageQueueAveragely());
+            DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(subItem.getGroupId());
 
             // 公共配置
             setCommonConfig(consumer);
@@ -236,10 +232,10 @@ public class ApacheRocketMqAutoConfigure implements InitializingBean {
         }
     }
 
-    private RPCHook getAclRpcHook() {
-        return new AclClientRPCHook(new SessionCredentials(
-                apacheRocketMqProperties.getAccessKeyId(), apacheRocketMqProperties.getAccessKeySecret()));
-    }
+//    private RPCHook getAclRpcHook() {
+//        return new AclClientRPCHook(new SessionCredentials(
+//                apacheRocketMqProperties.getAccessKeyId(), apacheRocketMqProperties.getAccessKeySecret()));
+//    }
 
     private void setCommonConfig(ClientConfig config) {
         if (StringUtils.hasText(apacheRocketMqProperties.getClientIp())) {
@@ -257,9 +253,7 @@ public class ApacheRocketMqAutoConfigure implements InitializingBean {
         if (apacheRocketMqProperties.getPersistConsumerOffsetInterval() != null) {
             config.setPersistConsumerOffsetInterval(apacheRocketMqProperties.getPersistConsumerOffsetInterval());
         }
-
         config.setNamesrvAddr(apacheRocketMqProperties.getNameServerAddr());
-
     }
 
     private XaTopicMessage createXaTopicMessage(Message msg) {

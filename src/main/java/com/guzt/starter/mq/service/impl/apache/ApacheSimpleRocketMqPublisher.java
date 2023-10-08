@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 /**
  * ApacheRocketMq推送消息到MQ服务端
  * 发布（pub）模式
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 @SuppressWarnings("unused")
 public class ApacheSimpleRocketMqPublisher implements TopicPublisher {

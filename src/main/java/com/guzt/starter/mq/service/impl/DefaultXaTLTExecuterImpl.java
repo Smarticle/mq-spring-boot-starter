@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * XaTopicLocalTransactionExecuter 的默认实现.
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 public class DefaultXaTLTExecuterImpl implements XaTopicLocalTransactionExecuter {
 

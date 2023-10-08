@@ -43,9 +43,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 
 /**
- * 开源Rabbitmq核心配置类
+ * RabbitMq 配置类
  *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
+ * @author liuyang
  */
 @Configuration
 @ConditionalOnClass({Channel.class})

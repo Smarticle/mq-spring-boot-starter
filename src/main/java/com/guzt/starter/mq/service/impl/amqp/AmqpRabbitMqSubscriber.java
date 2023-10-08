@@ -21,8 +21,6 @@ import java.util.concurrent.TimeoutException;
 /**
  * 开源RabbitMq推送消息到MQ服务端
  * 订阅（Sub）模式
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 @SuppressWarnings("unused")
 public class AmqpRabbitMqSubscriber implements TopicSubscriber {
@@ -216,7 +214,7 @@ public class AmqpRabbitMqSubscriber implements TopicSubscriber {
                     retryCnt, topicMessage.getTopicName(), topicMessage.getMessageId(), topicMessage.getBussinessKey(), topicMessage.getTags(), groupId);
             AmqpRabbitMqPublisher.publishTopicMessage(
                     channel, RETRY_LETTER_FIX + exchangeName, topicMessage,
-                    PublishType.CONSUM_FAIL_RETRY.getValue(), rabbitMqSubProperties.getRetryConsumIntervalSeconds() * 1000);
+                    PublishType.CONSUME_FAIL_RETRY.getValue(), rabbitMqSubProperties.getRetryConsumIntervalSeconds() * 1000);
         }
     }
 

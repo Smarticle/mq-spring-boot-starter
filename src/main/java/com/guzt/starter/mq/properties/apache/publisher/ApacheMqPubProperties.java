@@ -2,8 +2,6 @@ package com.guzt.starter.mq.properties.apache.publisher;
 
 /**
  * 消息生产者配置
- *
- * @author <a href="mailto:gzt19881123@163.com">guzhongtao</a>
  */
 public class ApacheMqPubProperties {
 
