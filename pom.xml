@@ -8,15 +8,15 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.8.RELEASE</version>
+        <version>2.2.7.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.guzt</groupId>
-    <artifactId>mymq-spring-boot-starter</artifactId>
+    <groupId>com.cetc36</groupId>
+    <artifactId>dkmq-spring-boot-starter</artifactId>
     <version>1.2-SNAPSHOT</version>
 
-    <name>mymq-spring-boot-starter</name>
+    <name>dkmq-spring-boot-starter</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,30 +24,13 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
-
-        <alibaba.amqp.version>1.0.5</alibaba.amqp.version>
         <apache.rocketmq.version>4.7.0</apache.rocketmq.version>
-        <amqp.client.version>5.10.0</amqp.client.version>
-        <aliyun.ons.client.version>1.8.4.Final</aliyun.ons.client.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-        </dependency>
-
-        <!-- 阿里云 RockMq -->
-        <dependency>
-            <groupId>com.aliyun.openservices</groupId>
-            <artifactId>ons-client</artifactId>
-            <version>${aliyun.ons.client.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- 社区版本 RocketMQ -->
@@ -58,22 +41,10 @@
             <version>${apache.rocketmq.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-acl</artifactId>
-            <scope>provided</scope>
-            <version>${apache.rocketmq.version}</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
-
-        <!--  rabbitmq 客户端 -->
-        <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
-            <scope>provided</scope>
-            <version>${amqp.client.version}</version>
-        </dependency>
-
     </dependencies>
-
 
     <build>
         <plugins>

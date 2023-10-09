@@ -1,3 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-                    com.guzt.starter.mq.config.ApacheRocketMqAutoConfigure,\
-                    com.guzt.starter.mq.config.AmqpRabbitMqAutoConfigure
+                    com.cetc36.starter.mq.config.ApacheRocketMQAutoConfigure
