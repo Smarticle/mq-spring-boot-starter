@@ -2,8 +2,8 @@ package com.cetc36.starter.mq.service.impl.rocketmq;
 
 import com.cetc36.starter.mq.model.MessageStatus;
 import com.cetc36.starter.mq.model.TopicMessage;
-import com.cetc36.starter.mq.properties.rocketmq.subscriber.ApacheMqSubProperties;
-import com.cetc36.starter.mq.RetryConsumeFailHandler;
+import com.cetc36.starter.mq.properties.rocketmq.subscriber.ApacheMQSubProperties;
+import com.cetc36.starter.mq.ConsumeFailHandler;
 import com.cetc36.starter.mq.TopicListener;
 import com.cetc36.starter.mq.service.TopicSubscriber;
 import lombok.extern.slf4j.Slf4j;
@@ -32,14 +32,14 @@ public class ApacheSimpleRocketMQSubscriber implements TopicSubscriber {
 
     boolean isStarted;
 
-    ApacheMqSubProperties apacheMqSubProperties;
+    ApacheMQSubProperties apacheMQSubProperties;
 
-    RetryConsumeFailHandler retryConsumeFailHandler;
+    ConsumeFailHandler consumeFailHandler;
 
-    public ApacheSimpleRocketMQSubscriber(DefaultMQPushConsumer consumer, ApacheMqSubProperties apacheMqSubProperties) {
+    public ApacheSimpleRocketMQSubscriber(DefaultMQPushConsumer consumer, ApacheMQSubProperties apacheMQSubProperties) {
         this.consumer = consumer;
-        this.beanName = apacheMqSubProperties.getBeanName();
-        this.apacheMqSubProperties = apacheMqSubProperties;
+        this.beanName = apacheMQSubProperties.getBeanName();
+        this.apacheMQSubProperties = apacheMQSubProperties;
     }
 
     public ApacheSimpleRocketMQSubscriber() {
@@ -73,7 +73,7 @@ public class ApacheSimpleRocketMQSubscriber implements TopicSubscriber {
             topicMessage.setCurrentRetryConsumeCount(messageExt.getReconsumeTimes());
             // 回调此listener
             MessageStatus messageStatus = listener.subscribe(topicMessage);
-            if (messageStatus.equals(MessageStatus.CommitMessage)) {
+            if (messageStatus.equals(MessageStatus.ConsumeSuccess)) {
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             } else {
                 // 消费失败
@@ -86,18 +86,18 @@ public class ApacheSimpleRocketMQSubscriber implements TopicSubscriber {
      * 消费失败处理
      */
     protected ConsumeConcurrentlyStatus failureFrequency(TopicMessage topicMessage) {
-        String messageUniqueId = topicMessage.getTopicName() + "_" + topicMessage.getTags() + "_" + topicMessage.getMessageId();
+        // String messageUniqueId = topicMessage.getTopicName() + "_" + topicMessage.getTags() + "_" + topicMessage.getMessageId();
         int retryCnt = topicMessage.getCurrentRetryConsumeCount();
-        if (retryCnt >= apacheMqSubProperties.getMaxRetryCount()) {
+        if (retryCnt >= apacheMQSubProperties.getMaxRetryCount()) {
             log.info("消息超过最大重新投递次数{} ，直接消费完成！ topicName={}, messageId={}, bizId={}, routingKey={}, groupId={}",
-                    apacheMqSubProperties.getMaxRetryCount(), topicMessage.getTopicName(),
-                    topicMessage.getMessageId(), topicMessage.getBizId(), topicMessage.getTags(), apacheMqSubProperties.getGroupId());
-            retryConsumeFailHandler.handle(topicMessage);
+                    apacheMQSubProperties.getMaxRetryCount(), topicMessage.getTopicName(),
+                    topicMessage.getMessageId(), topicMessage.getBizId(), topicMessage.getTags(), apacheMQSubProperties.getGroupId());
+            consumeFailHandler.handle(topicMessage);
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         } else {
             log.info("消息重新投递.... topicName={}, messageId={}, bizId={}, routingKey={}, groupId={}",
                     topicMessage.getTopicName(), topicMessage.getMessageId(), topicMessage.getBizId(),
-                    topicMessage.getTags(), apacheMqSubProperties.getGroupId());
+                    topicMessage.getTags(), apacheMQSubProperties.getGroupId());
             return ConsumeConcurrentlyStatus.RECONSUME_LATER;
         }
     }
@@ -135,8 +135,8 @@ public class ApacheSimpleRocketMQSubscriber implements TopicSubscriber {
     }
 
     @Override
-    public void setRetryConsumeFailHandler(RetryConsumeFailHandler retryConsumeFailHandler) {
-        this.retryConsumeFailHandler = retryConsumeFailHandler;
+    public void setRetryConsumeFailHandler(ConsumeFailHandler consumeFailHandler) {
+        this.consumeFailHandler = consumeFailHandler;
     }
 
     public DefaultMQPushConsumer getConsumer() {

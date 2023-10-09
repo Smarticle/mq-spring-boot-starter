@@ -36,9 +36,9 @@ public class DefaultTopicListenerImpl implements TopicListener {
     public MessageStatus subscribe(TopicMessage topicMessage) {
         if (topicMessage != null) {
             log.debug("消息 id={}, key={} 被 DefaultTopicListenerImpl 消费了", topicMessage.getMessageId(), topicMessage.getBizId());
-            return MessageStatus.CommitMessage;
+            return MessageStatus.ConsumeSuccess;
         } else {
-            return MessageStatus.ReconsumeLater;
+            return MessageStatus.ConsumeFail;
         }
     }
 }

@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-                    com.cetc36.starter.mq.config.ApacheRocketMQAutoConfigure
+                    com.cetc36.starter.mq.config.RocketMQAutoConfigure

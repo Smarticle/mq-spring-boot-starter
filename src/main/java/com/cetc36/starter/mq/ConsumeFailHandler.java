@@ -8,7 +8,7 @@ import com.cetc36.starter.mq.model.Message;
  *
  * @author liuyang
  */
-public interface RetryConsumeFailHandler {
+public interface ConsumeFailHandler {
 
     /**
      * 处理

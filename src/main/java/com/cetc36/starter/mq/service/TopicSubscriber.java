@@ -1,6 +1,6 @@
 package com.cetc36.starter.mq.service;
 
-import com.cetc36.starter.mq.RetryConsumeFailHandler;
+import com.cetc36.starter.mq.ConsumeFailHandler;
 import com.cetc36.starter.mq.TopicListener;
 
 import java.io.IOException;
@@ -37,8 +37,8 @@ public interface TopicSubscriber extends Manage {
     /**
      * 设置重试最大次数后失败的处理者
      *
-     * @param retryConsumeFailHandler 重试最大次数后失败的处理者
+     * @param consumeFailHandler 重试最大次数后失败的处理者
      */
-    void setRetryConsumeFailHandler(RetryConsumeFailHandler retryConsumeFailHandler);
+    void setRetryConsumeFailHandler(ConsumeFailHandler consumeFailHandler);
 
 }

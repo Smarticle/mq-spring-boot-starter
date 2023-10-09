@@ -2,16 +2,16 @@ package com.cetc36.starter.mq.config;
 
 import com.cetc36.starter.mq.properties.rocketmq.ApacheRocketMQProperties;
 import com.cetc36.starter.mq.properties.rocketmq.publisher.ApacheMQPubProperties;
-import com.cetc36.starter.mq.properties.rocketmq.subscriber.ApacheMqSubProperties;
-import com.cetc36.starter.mq.RetryConsumeFailHandler;
+import com.cetc36.starter.mq.properties.rocketmq.subscriber.ApacheMQSubProperties;
+import com.cetc36.starter.mq.ConsumeFailHandler;
 import com.cetc36.starter.mq.TopicListener;
-import com.cetc36.starter.mq.service.impl.DefaultRetryConsumeFailHandler;
+import com.cetc36.starter.mq.service.TopicSubscriber;
+import com.cetc36.starter.mq.service.impl.DefaultConsumeFailHandler;
 import com.cetc36.starter.mq.service.impl.DefaultTopicListenerImpl;
 import com.cetc36.starter.mq.service.impl.rocketmq.ApacheSimpleRocketMQPublisher;
 import com.cetc36.starter.mq.service.impl.rocketmq.ApacheSimpleRocketMQSubscriber;
 import com.cetc36.starter.mq.util.BeanArgBuilder;
-import com.cetc36.starter.mq.util.BeanRegistrarUtil;
-import com.cetc36.starter.mq.util.MQUtil;
+import com.cetc36.starter.mq.util.BeanRegisterUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.ClientConfig;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
@@ -31,9 +31,12 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * RocketMQ 配置类
@@ -45,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @ConditionalOnClass({SendMessageContext.class})
 @ConditionalOnProperty(prefix = "cetc36.mq.rocketmq", value = "enable", havingValue = "true")
 @EnableConfigurationProperties({ApacheRocketMQProperties.class})
-public class ApacheRocketMQAutoConfigure implements InitializingBean {
+public class RocketMQAutoConfigure implements InitializingBean {
 
     @Resource
     private ApacheRocketMQProperties apacheRocketMQProperties;
@@ -54,15 +57,15 @@ public class ApacheRocketMQAutoConfigure implements InitializingBean {
     private ApplicationContext applicationContext;
 
     /**
-     * 消息消费者
+     * Spring可自动注入TopicListener，Key为beanName
      */
     @Autowired
     private Map<String, TopicListener> listenerMap = new ConcurrentHashMap<>(4);
 
     @Bean
     @ConditionalOnMissingBean
-    public RetryConsumeFailHandler defaultRetryConsumeFailHandler() {
-        return new DefaultRetryConsumeFailHandler();
+    public ConsumeFailHandler defaultRetryConsumeFailHandler() {
+        return new DefaultConsumeFailHandler();
     }
 
     @Bean
@@ -89,7 +92,6 @@ public class ApacheRocketMQAutoConfigure implements InitializingBean {
             return;
         }
 
-        //获取BeanFactory
         DefaultListableBeanFactory defaultListableBeanFactory =
                 (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
 
@@ -118,7 +120,7 @@ public class ApacheRocketMQAutoConfigure implements InitializingBean {
             beanArgBuilder.setConstructorArgs(new Object[]{producer, pubItem.getBeanName()});
             beanArgBuilder.setInitMethodName("start");
             beanArgBuilder.setDestroyMethodName("close");
-            BeanRegistrarUtil.registerBean(defaultListableBeanFactory, pubItem.getBeanName(), ApacheSimpleRocketMQPublisher.class, beanArgBuilder);
+            BeanRegisterUtil.registerBean(defaultListableBeanFactory, pubItem.getBeanName(), ApacheSimpleRocketMQPublisher.class, beanArgBuilder);
         }
     }
 
@@ -131,7 +133,7 @@ public class ApacheRocketMQAutoConfigure implements InitializingBean {
             return;
         }
 
-        List<ApacheMqSubProperties> properties = apacheRocketMQProperties.getSubscribers();
+        List<ApacheMQSubProperties> properties = apacheRocketMQProperties.getSubscribers();
         if (properties == null || properties.isEmpty()) {
             log.info("没有配置消息消息者的属性, 不初始化消息消费者对象");
             return;
@@ -139,23 +141,26 @@ public class ApacheRocketMQAutoConfigure implements InitializingBean {
         //获取BeanFactory
         DefaultListableBeanFactory defaultListableBeanFactory =
                 (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
-        RetryConsumeFailHandler retryConsumeFailHandler = applicationContext.getBean(RetryConsumeFailHandler.class);
+        ConsumeFailHandler consumeFailHandler = applicationContext.getBean(ConsumeFailHandler.class);
+        Map<String, List<TopicListener>> listenerMapBySubBeanName = topicListenerGroupBySubBean(listenerMap);
 
-        Map<String, List<TopicListener>> listenerMapBySubBeanName = MQUtil.topicListenerGroupBySubBean(listenerMap);
-
-        for (ApacheMqSubProperties subItem : properties) {
+        for (ApacheMQSubProperties subItem : properties) {
             DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(subItem.getGroupId());
             // 公共配置
             setCommonConfig(consumer);
+            // TODO 待测试
             // Wrong time format 2017_0422_221800
             consumer.setConsumeTimestamp("20180422221800");
+            // Listener设置
             BeanArgBuilder beanArgBuilder = new BeanArgBuilder();
             beanArgBuilder.setConstructorArgs(new Object[]{consumer, subItem});
-            // start 方法在MQUtil.setListenerAndStartSub
+            // start方法setListener后手动调用
             beanArgBuilder.setDestroyMethodName("close");
-            BeanRegistrarUtil.registerBean(defaultListableBeanFactory, subItem.getBeanName(), ApacheSimpleRocketMQSubscriber.class, beanArgBuilder);
+            BeanRegisterUtil.registerBean(defaultListableBeanFactory, subItem.getBeanName(), ApacheSimpleRocketMQSubscriber.class, beanArgBuilder);
             ApacheSimpleRocketMQSubscriber subscriber = applicationContext.getBean(subItem.getBeanName(), ApacheSimpleRocketMQSubscriber.class);
-            MQUtil.setListenerAndStartSub(subItem.getBeanName(), subscriber, retryConsumeFailHandler, listenerMapBySubBeanName);
+            setListener(subItem.getBeanName(), subscriber, consumeFailHandler, listenerMapBySubBeanName);
+            // 启动
+            subscriber.start();
         }
     }
 
@@ -179,5 +184,43 @@ public class ApacheRocketMQAutoConfigure implements InitializingBean {
             config.setPersistConsumerOffsetInterval(apacheRocketMQProperties.getPersistConsumerOffsetInterval());
         }
         config.setNamesrvAddr(apacheRocketMQProperties.getNameServerAddr());
+    }
+
+    /**
+     * 设置消费服务TopicListener，并且启动消费服务
+     *
+     * @param subscriberBeanName       ignore
+     * @param subscriber               ignore
+     * @param listenerMapBySubBeanName ignore
+     * @param consumeFailHandler       ignore
+     */
+    private void setListener(
+            String subscriberBeanName,
+            TopicSubscriber subscriber,
+            ConsumeFailHandler consumeFailHandler,
+            Map<String, List<TopicListener>> listenerMapBySubBeanName) throws IOException {
+
+        List<TopicListener> listeners = listenerMapBySubBeanName.get(subscriberBeanName);
+        if (listeners == null || listeners.isEmpty()) {
+            return;
+        }
+        for (TopicListener listener : listeners) {
+            subscriber.subscribe(listener.getTopicName(), listener.getTagExpression(), listener);
+        }
+        subscriber.setRetryConsumeFailHandler(consumeFailHandler);
+    }
+
+    /**
+     * TopicListener 按自定义BeanName分组
+     * key：SubscriberBeanName Value: 相应TopicListener
+     *
+     * @param listenerMap TopicListener
+     * @return Map
+     */
+    private Map<String, List<TopicListener>> topicListenerGroupBySubBean(Map<String, TopicListener> listenerMap) {
+        List<TopicListener> topicListenerList = new ArrayList<>(4);
+        listenerMap.forEach((k, v) -> topicListenerList.add(v));
+        //groupBy SubscriberBeanName
+        return topicListenerList.stream().collect(groupingBy(TopicListener::getSubscriberBeanName));
     }
 }

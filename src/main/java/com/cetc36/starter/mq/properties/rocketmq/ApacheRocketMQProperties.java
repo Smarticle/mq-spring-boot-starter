@@ -2,7 +2,7 @@ package com.cetc36.starter.mq.properties.rocketmq;
 
 import com.cetc36.starter.mq.properties.BaseProperties;
 import com.cetc36.starter.mq.properties.rocketmq.publisher.ApacheMQPubProperties;
-import com.cetc36.starter.mq.properties.rocketmq.subscriber.ApacheMqSubProperties;
+import com.cetc36.starter.mq.properties.rocketmq.subscriber.ApacheMQSubProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -55,6 +55,6 @@ public class ApacheRocketMQProperties extends BaseProperties {
     /**
      * 消息订阅者
      */
-    private List<ApacheMqSubProperties> subscribers;
+    private List<ApacheMQSubProperties> subscribers;
 
 }

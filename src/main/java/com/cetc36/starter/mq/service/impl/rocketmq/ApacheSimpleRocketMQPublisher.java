@@ -4,7 +4,7 @@ import com.cetc36.starter.mq.exception.TopicMQException;
 import com.cetc36.starter.mq.model.TopicMessage;
 import com.cetc36.starter.mq.model.TopicMessageSendResult;
 import com.cetc36.starter.mq.TopicPublisher;
-import com.cetc36.starter.mq.TopicSendCallback;
+import com.cetc36.starter.mq.service.TopicSendCallback;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.rocketmq.client.exception.MQClientException;
