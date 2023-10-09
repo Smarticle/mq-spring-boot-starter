@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 /**
  * ApacheRocketMq推送消息到MQ服务端
  * 发布（pub）模式
+ *
+ * @author liuyang
  */
 @Getter
 @Setter
