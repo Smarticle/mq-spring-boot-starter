@@ -1,7 +1,7 @@
 package com.cetc36.starter.mq.service.impl;
 
 import com.cetc36.starter.mq.model.Message;
-import com.cetc36.starter.mq.service.RetryConsumeFailHandler;
+import com.cetc36.starter.mq.RetryConsumeFailHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**

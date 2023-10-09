@@ -1,7 +1,8 @@
-package com.cetc36.starter.mq.service;
+package com.cetc36.starter.mq;
 
 import com.cetc36.starter.mq.model.TopicMessage;
 import com.cetc36.starter.mq.model.TopicMessageSendResult;
+import com.cetc36.starter.mq.service.Manage;
 
 /**
  * 推送消息到MQ服务端

@@ -1,8 +1,8 @@
 package com.cetc36.starter.mq.util;
 
 import com.cetc36.starter.mq.service.TopicSubscriber;
-import com.cetc36.starter.mq.service.RetryConsumeFailHandler;
-import com.cetc36.starter.mq.service.TopicListener;
+import com.cetc36.starter.mq.RetryConsumeFailHandler;
+import com.cetc36.starter.mq.TopicListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
