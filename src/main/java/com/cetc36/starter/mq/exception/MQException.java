@@ -1,22 +1,19 @@
 package com.cetc36.starter.mq.exception;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 消息发送失败统一异常类
  *
  * @author liuyang
  */
+@Getter
+@Setter
 public class MQException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     private String messageId;
-
-    public String getMessageId() {
-        return messageId;
-    }
-
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
-    }
 
     /**
      * 默认异常构造函数.

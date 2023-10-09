@@ -69,7 +69,7 @@ public class ApacheSimpleRocketMQPublisher implements TopicPublisher {
         }
         TopicMessageSendResult topicMessageSendResult = new TopicMessageSendResult();
         topicMessageSendResult.setMessageId(sendResult.getMsgId());
-        topicMessageSendResult.setBusinessKey(message.getKeys());
+        topicMessageSendResult.setBizId(message.getKeys());
         topicMessageSendResult.setTags(message.getTags());
         if (sendResult.getMessageQueue() != null) {
             topicMessageSendResult.setTopicName(sendResult.getMessageQueue().getTopic());
@@ -107,7 +107,7 @@ public class ApacheSimpleRocketMQPublisher implements TopicPublisher {
                         topicMessageSendResult.setTopicName(sendResult.getMessageQueue().getTopic());
                     }
                     topicMessageSendResult.setMessageId(sendResult.getMsgId());
-                    topicMessageSendResult.setBusinessKey(message.getKeys());
+                    topicMessageSendResult.setBizId(message.getKeys());
                     topicMessageSendResult.setTags(message.getTags());
                     topicSendCallback.onSuccess(topicMessageSendResult);
                 }

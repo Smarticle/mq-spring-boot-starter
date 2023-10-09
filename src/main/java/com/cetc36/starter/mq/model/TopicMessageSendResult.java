@@ -25,7 +25,7 @@ public class TopicMessageSendResult implements Serializable {
      * 业务唯一id，由发送方发送时传递的值.
      * 由发送方发送时传递的值
      */
-    private String businessKey;
+    private String bizId;
 
     /**
      * 消息主题名称, 最长不超过255个字符; 由a-z, A-Z, 0-9, 以及中划线"-"和下划线"_"构成.

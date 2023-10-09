@@ -1,8 +1,13 @@
 package com.cetc36.starter.mq.exception;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 消息发送失败统一异常类
  */
+@Getter
+@Setter
 public class TopicMQException extends MQException {
     private static final long serialVersionUID = 1L;
 
@@ -16,37 +21,9 @@ public class TopicMQException extends MQException {
     /**
      * <p>
      *   业务唯一id，由发送方发送时传递的值.
-     * </p>
-     *
-     * <p>
-     *   <strong>由发送方发送时传递的值</strong>
-     * </p>
      */
     private String businessKey;
 
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    public String getBusinessKey() {
-        return businessKey;
-    }
-
-    public void setBusinessKey(String businessKey) {
-        this.businessKey = businessKey;
-    }
-
-    public String getTopicName() {
-        return topicName;
-    }
-
-    public void setTopicName(String topicName) {
-        this.topicName = topicName;
-    }
 
     /**
      * 默认异常构造函数.
