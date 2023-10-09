@@ -1,0 +1,11 @@
+cetc36:
+  mq:
+    rocketmq:
+      enable: true
+      access-key-id: xxx
+      access-key-secret: bbb
+      name-server-addr: localhost:9876
+      publishers:
+        - { beanName: publishService1, groupId: group1, sendMsgTimeoutMillis: 5000 }
+      subscribers:
+        - { beanName: subscriberService1, groupId: group1 }

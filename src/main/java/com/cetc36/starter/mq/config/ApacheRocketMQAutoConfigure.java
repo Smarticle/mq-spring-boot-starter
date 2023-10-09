@@ -61,7 +61,7 @@ public class ApacheRocketMQAutoConfigure implements InitializingBean {
 
     @Bean
     @ConditionalOnMissingBean
-    public RetryConsumeFailHandler defaultRetryConsumFailHandler() {
+    public RetryConsumeFailHandler defaultRetryConsumeFailHandler() {
         return new DefaultRetryConsumeFailHandler();
     }
 
