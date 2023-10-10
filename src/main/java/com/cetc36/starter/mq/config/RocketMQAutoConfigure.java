@@ -148,9 +148,8 @@ public class RocketMQAutoConfigure implements InitializingBean {
             DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(subItem.getGroupId());
             // 公共配置
             setCommonConfig(consumer);
-            // TODO 待测试
             // Wrong time format 2017_0422_221800
-            consumer.setConsumeTimestamp("20180422221800");
+            //consumer.setConsumeTimestamp("20180422221800");
             // Listener设置
             BeanArgBuilder beanArgBuilder = new BeanArgBuilder();
             beanArgBuilder.setConstructorArgs(new Object[]{consumer, subItem});

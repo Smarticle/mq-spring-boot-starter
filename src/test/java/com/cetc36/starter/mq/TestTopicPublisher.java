@@ -60,7 +60,6 @@ public class TestTopicPublisher {
                 log.error("ApacheRocketMq send fail", topicMqException);
             }
         });
-        Thread.sleep(5000);
     }
 
 }

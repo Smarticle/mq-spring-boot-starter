@@ -13,10 +13,10 @@
     </parent>
 
     <groupId>com.cetc36</groupId>
-    <artifactId>dkmq-spring-boot-starter</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <artifactId>chameleon-spring-boot-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
 
-    <name>dkmq-spring-boot-starter</name>
+    <name>chameleon-mq-starter</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,7 +24,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
-        <rocketmq.version>4.7.0</rocketmq.version>
+        <rocketmq.version>5.1.0</rocketmq.version>
     </properties>
 
     <dependencies>
