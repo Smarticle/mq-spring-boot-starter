@@ -6,4 +6,4 @@ cetc36:
       publishers:
         - { beanName: publishService1, groupId: group1, sendMsgTimeoutMillis: 5000 }
       subscribers:
-        - { beanName: subscriberService1, groupId: group3 }
+        - { beanName: subscriberService1, groupId: group1, maxRetryCount: 1 }
