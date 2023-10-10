@@ -13,9 +13,9 @@
     </parent>
 
     <groupId>com.cetc36</groupId>
-    <artifactId>chameleon-mq-starter</artifactId>
+    <artifactId>cetc36-chameleon-mq-starter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>chameleon-mq-starter</name>
+    <name>cetc36-chameleon-mq-starter</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -27,6 +27,7 @@
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -36,6 +37,7 @@
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-client</artifactId>
+            <scope>provide</scope>
             <version>${rocketmq.version}</version>
         </dependency>
 
@@ -59,20 +61,41 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
             <!-- 生成sources源码包的插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.0</version>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
+                        <!--打包源文件阶段-->
+                        <phase>package</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>install-sources</id>
+                        <!--打包源文件阶段-->
+                        <phase>install</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
 </project>
