@@ -1,5 +1,6 @@
 package com.cetc36.starter.mq;
 
+import com.cetc36.starter.mq.api.TopicListener;
 import com.cetc36.starter.mq.model.MessageStatus;
 import com.cetc36.starter.mq.model.TopicMessage;
 import lombok.extern.slf4j.Slf4j;

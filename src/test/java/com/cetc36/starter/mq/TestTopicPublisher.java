@@ -1,9 +1,10 @@
 package com.cetc36.starter.mq;
 
+import com.cetc36.starter.mq.api.TopicPublisher;
 import com.cetc36.starter.mq.exception.TopicMQException;
 import com.cetc36.starter.mq.model.TopicMessage;
 import com.cetc36.starter.mq.model.TopicMessageSendResult;
-import com.cetc36.starter.mq.service.TopicSendCallback;
+import com.cetc36.starter.mq.api.TopicSendCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

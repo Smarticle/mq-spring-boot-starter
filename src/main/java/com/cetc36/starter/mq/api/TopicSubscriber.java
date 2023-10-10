@@ -1,7 +1,8 @@
-package com.cetc36.starter.mq.service;
+package com.cetc36.starter.mq.api;
 
-import com.cetc36.starter.mq.ConsumeFailHandler;
-import com.cetc36.starter.mq.TopicListener;
+import com.cetc36.starter.mq.api.ConsumeFailHandler;
+import com.cetc36.starter.mq.api.TopicListener;
+import com.cetc36.starter.mq.service.Manage;
 
 import java.io.IOException;
 

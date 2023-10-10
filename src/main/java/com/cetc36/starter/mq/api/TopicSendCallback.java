@@ -1,4 +1,4 @@
-package com.cetc36.starter.mq.service;
+package com.cetc36.starter.mq.api;
 
 import com.cetc36.starter.mq.model.TopicMessageSendResult;
 import com.cetc36.starter.mq.exception.TopicMQException;

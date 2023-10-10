@@ -1,4 +1,4 @@
-package com.cetc36.starter.mq;
+package com.cetc36.starter.mq.api;
 
 import com.cetc36.starter.mq.model.MessageStatus;
 import com.cetc36.starter.mq.model.TopicMessage;

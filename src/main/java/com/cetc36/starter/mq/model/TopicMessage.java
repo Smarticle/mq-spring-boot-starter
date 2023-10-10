@@ -53,11 +53,6 @@ public class TopicMessage implements Message {
     private byte[] messageBody;
 
     /**
-     * 当前发送失败后，已经被重试发送的次数
-     */
-    private int currentRetryPublishCount;
-
-    /**
      * 当前消费失败后，已经被重试消费的次数
      */
     private int currentRetryConsumeCount;

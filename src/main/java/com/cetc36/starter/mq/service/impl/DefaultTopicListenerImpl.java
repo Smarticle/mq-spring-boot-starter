@@ -2,7 +2,7 @@ package com.cetc36.starter.mq.service.impl;
 
 import com.cetc36.starter.mq.model.MessageStatus;
 import com.cetc36.starter.mq.model.TopicMessage;
-import com.cetc36.starter.mq.TopicListener;
+import com.cetc36.starter.mq.api.TopicListener;
 import lombok.extern.slf4j.Slf4j;
 
 /**
