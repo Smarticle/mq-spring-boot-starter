@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!--================  Spring Boot ===================== -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -33,11 +32,10 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- RocketMQ -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-client</artifactId>
-            <scope>provide</scope>
+            <scope>provided</scope>
             <version>${rocketmq.version}</version>
         </dependency>
 
@@ -69,7 +67,6 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
-            <!-- 生成sources源码包的插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -79,7 +76,6 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
-                        <!--打包源文件阶段-->
                         <phase>package</phase>
                         <goals>
                             <goal>jar-no-fork</goal>
@@ -87,7 +83,6 @@
                     </execution>
                     <execution>
                         <id>install-sources</id>
-                        <!--打包源文件阶段-->
                         <phase>install</phase>
                         <goals>
                             <goal>jar-no-fork</goal>
@@ -97,5 +92,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
