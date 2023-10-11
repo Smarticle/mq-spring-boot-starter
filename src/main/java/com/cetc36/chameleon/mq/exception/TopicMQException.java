@@ -19,10 +19,9 @@ public class TopicMQException extends MQException {
     private String tag;
 
     /**
-     * <p>
-     *   业务唯一id，由发送方发送时传递的值.
+     * 业务唯一id，由发送方发送时传递的值.
      */
-    private String businessKey;
+    private String bizId;
 
 
     /**

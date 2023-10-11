@@ -72,7 +72,7 @@ public class SimpleOceanSubscriber implements TopicSubscriber {
             topicMessage.setTopicName(messageExt.getTopic());
             topicMessage.setCurrentRetryConsumeCount(messageExt.getReconsumeTimes());
             // 回调此listener
-            MessageStatus messageStatus = listener.subscribe(topicMessage);
+            MessageStatus messageStatus = listener.consume(topicMessage);
             if (messageStatus.equals(MessageStatus.ConsumeSuccess)) {
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             } else {

@@ -33,7 +33,7 @@ public class DefaultTopicListenerImpl implements TopicListener {
     }
 
     @Override
-    public MessageStatus subscribe(TopicMessage topicMessage) {
+    public MessageStatus consume(TopicMessage topicMessage) {
         if (topicMessage != null) {
             log.debug("消息 id={}, key={} 被 DefaultTopicListenerImpl 消费了", topicMessage.getMessageId(), topicMessage.getBizId());
             return MessageStatus.ConsumeSuccess;

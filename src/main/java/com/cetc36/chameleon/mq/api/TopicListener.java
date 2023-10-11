@@ -31,18 +31,18 @@ public interface TopicListener {
     /**
      * 订阅的 tag
      *
-     * @return 订阅过滤表达式字符串，ONS服务器依据此表达式进行过滤。只支持或运算<br>
-     * eg: "tag1 || tag2 || tag3"<br>
-     * 如果subExpression等于null或者*，则表示全部订阅
+     * @return 订阅过滤表达式字符串，服务器依据此表达式进行过滤。只支持或运算
+     * eg: "tag1 || tag2 || tag3"
+     * 如果等于null或者*，则表示全部订阅
      */
     String getTagExpression();
 
     /**
-     * 消息订阅
+     * 消费消息
      *
      * @param topicMessage 从消息服务器获得的订阅消息
      * @return 执行完本地业务逻辑反馈消息服务器是否消费完毕 MessageStatus
      */
-    MessageStatus subscribe(TopicMessage topicMessage);
+    MessageStatus consume(TopicMessage topicMessage);
 
 }

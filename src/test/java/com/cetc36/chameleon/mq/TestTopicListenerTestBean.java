@@ -26,7 +26,7 @@ public class TestTopicListenerTestBean implements TopicListener {
     }
 
     @Override
-    public MessageStatus subscribe(TopicMessage topicMessage) {
+    public MessageStatus consume(TopicMessage topicMessage) {
         log.info("TopicMessage: {}", topicMessage);
         return MessageStatus.ConsumeFail;
         // return MessageStatus.ConsumeSuccess;

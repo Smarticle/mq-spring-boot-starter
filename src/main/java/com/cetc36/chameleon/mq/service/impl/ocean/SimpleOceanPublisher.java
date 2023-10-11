@@ -55,7 +55,7 @@ public class SimpleOceanPublisher implements TopicPublisher {
                     + " 发送异常 ", message.getTopic(), e);
             topicMqException.setMessageId(topicMessage.getMessageId());
             topicMqException.setTag(topicMessage.getTags());
-            topicMqException.setBusinessKey(topicMessage.getBizId());
+            topicMqException.setBizId(topicMessage.getBizId());
             throw topicMqException;
         }
         if (!sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
@@ -63,7 +63,7 @@ public class SimpleOceanPublisher implements TopicPublisher {
                     + "发送异常 " + sendResult.getSendStatus().toString(), message.getTopic());
             topicMqException.setMessageId(sendResult.getMsgId());
             topicMqException.setTag(topicMessage.getTags());
-            topicMqException.setBusinessKey(topicMessage.getBizId());
+            topicMqException.setBizId(topicMessage.getBizId());
             throw topicMqException;
         }
         TopicMessageSendResult topicMessageSendResult = new TopicMessageSendResult();
@@ -116,7 +116,7 @@ public class SimpleOceanPublisher implements TopicPublisher {
                     TopicMQException topicMqException = new TopicMQException(e);
                     topicMqException.setTopicName(message.getTopic());
                     topicMqException.setMessageId(message.getBuyerId());
-                    topicMqException.setBusinessKey(message.getKeys());
+                    topicMqException.setBizId(message.getKeys());
                     topicMqException.setTag(message.getTags());
                     topicSendCallback.onFail(topicMqException);
                 }
