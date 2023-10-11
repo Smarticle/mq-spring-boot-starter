@@ -1,6 +1,6 @@
 cetc36:
   mq:
-    rocketmq:
+    ocean:
       enable: true
       name-server-addr: localhost:9876
       publishers:

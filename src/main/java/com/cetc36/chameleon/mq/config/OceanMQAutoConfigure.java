@@ -10,8 +10,8 @@ import com.cetc36.chameleon.mq.properties.rocketmq.publisher.ApacheMQPubProperti
 import com.cetc36.chameleon.mq.properties.rocketmq.subscriber.ApacheMQSubProperties;
 import com.cetc36.chameleon.mq.service.impl.DefaultConsumeFailHandler;
 import com.cetc36.chameleon.mq.service.impl.DefaultTopicListenerImpl;
-import com.cetc36.chameleon.mq.service.impl.rocketmq.ApacheSimpleRocketMQPublisher;
-import com.cetc36.chameleon.mq.service.impl.rocketmq.ApacheSimpleRocketMQSubscriber;
+import com.cetc36.chameleon.mq.service.impl.ocean.SimpleOceanPublisher;
+import com.cetc36.chameleon.mq.service.impl.ocean.SimpleOceanSubscriber;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.ClientConfig;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
@@ -29,7 +29,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +45,14 @@ import static java.util.stream.Collectors.groupingBy;
 @Slf4j
 @Configuration
 @ConditionalOnClass({SendMessageContext.class})
-@ConditionalOnProperty(prefix = "cetc36.mq.rocketmq", value = "enable", havingValue = "true")
+@ConditionalOnProperty(prefix = "cetc36.mq.ocean", value = "enable", havingValue = "true")
 @EnableConfigurationProperties({ApacheRocketMQProperties.class})
-public class RocketMQAutoConfigure implements InitializingBean {
+public class OceanMQAutoConfigure implements InitializingBean {
 
-    @Resource
+    @Autowired
     private ApacheRocketMQProperties apacheRocketMQProperties;
 
-    @Resource
+    @Autowired
     private ApplicationContext applicationContext;
 
     /**
@@ -120,7 +119,7 @@ public class RocketMQAutoConfigure implements InitializingBean {
             beanArgBuilder.setConstructorArgs(new Object[]{producer, pubItem.getBeanName()});
             beanArgBuilder.setInitMethodName("start");
             beanArgBuilder.setDestroyMethodName("close");
-            BeanRegisterUtil.registerBean(defaultListableBeanFactory, pubItem.getBeanName(), ApacheSimpleRocketMQPublisher.class, beanArgBuilder);
+            BeanRegisterUtil.registerBean(defaultListableBeanFactory, pubItem.getBeanName(), SimpleOceanPublisher.class, beanArgBuilder);
         }
     }
 
@@ -155,8 +154,8 @@ public class RocketMQAutoConfigure implements InitializingBean {
             beanArgBuilder.setConstructorArgs(new Object[]{consumer, subItem});
             // start方法setListener后手动调用
             beanArgBuilder.setDestroyMethodName("close");
-            BeanRegisterUtil.registerBean(defaultListableBeanFactory, subItem.getBeanName(), ApacheSimpleRocketMQSubscriber.class, beanArgBuilder);
-            ApacheSimpleRocketMQSubscriber subscriber = applicationContext.getBean(subItem.getBeanName(), ApacheSimpleRocketMQSubscriber.class);
+            BeanRegisterUtil.registerBean(defaultListableBeanFactory, subItem.getBeanName(), SimpleOceanSubscriber.class, beanArgBuilder);
+            SimpleOceanSubscriber subscriber = applicationContext.getBean(subItem.getBeanName(), SimpleOceanSubscriber.class);
             setListener(subItem.getBeanName(), subscriber, consumeFailHandler, listenerMapBySubBeanName);
             // 启动
             subscriber.start();

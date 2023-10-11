@@ -1,4 +1,4 @@
-package com.cetc36.chameleon.mq.service.impl.rocketmq;
+package com.cetc36.chameleon.mq.service.impl.ocean;
 
 import com.cetc36.chameleon.mq.api.TopicPublisher;
 import com.cetc36.chameleon.mq.api.TopicSendCallback;
@@ -25,7 +25,7 @@ import org.apache.rocketmq.common.message.Message;
 @Setter
 @Slf4j
 @SuppressWarnings("unused")
-public class ApacheSimpleRocketMQPublisher implements TopicPublisher {
+public class SimpleOceanPublisher implements TopicPublisher {
 
     /**
      * apache rocketmq producer
@@ -36,12 +36,12 @@ public class ApacheSimpleRocketMQPublisher implements TopicPublisher {
 
     boolean isStarted;
 
-    public ApacheSimpleRocketMQPublisher(DefaultMQProducer producer, String beanName) {
+    public SimpleOceanPublisher(DefaultMQProducer producer, String beanName) {
         this.producer = producer;
         this.beanName = beanName;
     }
 
-    public ApacheSimpleRocketMQPublisher() {
+    public SimpleOceanPublisher() {
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ApacheSimpleRocketMQPublisher implements TopicPublisher {
                 @Override
                 public void onSuccess(SendResult sendResult) {
                     if (!sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
-                        throw new TopicMQException("ApacheRocketMq businessKey =" + message.getKeys() + " 异步发送 onSuccess方法异常 " + sendResult.getSendStatus().toString(), message.getTopic());
+                        throw new TopicMQException("Ocean businessKey =" + message.getKeys() + " 异步发送 onSuccess方法异常 " + sendResult.getSendStatus().toString(), message.getTopic());
                     }
                     TopicMessageSendResult topicMessageSendResult = new TopicMessageSendResult();
                     if (sendResult.getMessageQueue() != null) {
@@ -122,7 +122,7 @@ public class ApacheSimpleRocketMQPublisher implements TopicPublisher {
                 }
             });
         } catch (Exception e) {
-            throw new TopicMQException("ApacheRocketMq businessKey =" + message.getKeys() + " 异步发送异常 ", message.getTopic(), e);
+            throw new TopicMQException("Ocean businessKey =" + message.getKeys() + " 异步发送异常 ", message.getTopic(), e);
         }
     }
 
@@ -138,18 +138,18 @@ public class ApacheSimpleRocketMQPublisher implements TopicPublisher {
 
     @Override
     public void start() {
-        log.info("【MQ】ApacheSimpleRocketMqPublisher[" + beanName + "] start...");
+        log.info("【MQ】SimpleOceanPublisher[" + beanName + "] start...");
         try {
             producer.start();
             isStarted = true;
         } catch (MQClientException e) {
-            log.error("【MQ】ApacheSimpleRocketMqPublisher[" + beanName + "] start error", e);
+            log.error("【MQ】SimpleOceanPublisher[" + beanName + "] start error", e);
         }
     }
 
     @Override
     public void close() {
-        log.info("【MQ】ApacheSimpleRocketMqPublisher[" + beanName + "] close...");
+        log.info("【MQ】SimpleOceanPublisher[" + beanName + "] close...");
         producer.shutdown();
     }
 

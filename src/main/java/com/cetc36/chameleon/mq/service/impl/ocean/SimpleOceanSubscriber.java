@@ -1,4 +1,4 @@
-package com.cetc36.chameleon.mq.service.impl.rocketmq;
+package com.cetc36.chameleon.mq.service.impl.ocean;
 
 import com.cetc36.chameleon.mq.api.ConsumeFailHandler;
 import com.cetc36.chameleon.mq.api.TopicListener;
@@ -21,7 +21,7 @@ import java.util.Properties;
  */
 @Slf4j
 @SuppressWarnings("unused")
-public class ApacheSimpleRocketMQSubscriber implements TopicSubscriber {
+public class SimpleOceanSubscriber implements TopicSubscriber {
 
     /**
      * rocketMq消费服务
@@ -36,13 +36,13 @@ public class ApacheSimpleRocketMQSubscriber implements TopicSubscriber {
 
     ConsumeFailHandler consumeFailHandler;
 
-    public ApacheSimpleRocketMQSubscriber(DefaultMQPushConsumer consumer, ApacheMQSubProperties apacheMQSubProperties) {
+    public SimpleOceanSubscriber(DefaultMQPushConsumer consumer, ApacheMQSubProperties apacheMQSubProperties) {
         this.consumer = consumer;
         this.beanName = apacheMQSubProperties.getBeanName();
         this.apacheMQSubProperties = apacheMQSubProperties;
     }
 
-    public ApacheSimpleRocketMQSubscriber() {
+    public SimpleOceanSubscriber() {
     }
 
     @Override
@@ -50,7 +50,7 @@ public class ApacheSimpleRocketMQSubscriber implements TopicSubscriber {
         try {
             consumer.subscribe(topic, tagExpression);
         } catch (MQClientException e) {
-            log.error("【MQ】ApacheSimpleRocketMqSubscriber[" + beanName + "] start error", e);
+            log.error("【MQ】SimpleOceanSubscriber[" + beanName + "] start error", e);
             return;
         }
         // 注册回调实现类来处理从broker拉取回来的消息
@@ -119,18 +119,18 @@ public class ApacheSimpleRocketMQSubscriber implements TopicSubscriber {
 
     @Override
     public void start() {
-        log.info("【MQ】ApacheSimpleRocketMqSubscriber[" + beanName + "] start...");
+        log.info("【MQ】SimpleOceanSubscriber[" + beanName + "] start...");
         try {
             consumer.start();
             isStarted = true;
         } catch (MQClientException e) {
-            log.error("【MQ】ApacheSimpleRocketMqSubscriber[" + beanName + "] start error", e);
+            log.error("【MQ】SimpleOceanSubscriber[" + beanName + "] start error", e);
         }
     }
 
     @Override
     public void close() {
-        log.info("【MQ】ApacheSimpleRocketMqSubscriber[" + beanName + "] close...");
+        log.info("【MQ】SimpleOceanSubscriber[" + beanName + "] close...");
         consumer.shutdown();
     }
 

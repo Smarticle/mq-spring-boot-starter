@@ -53,12 +53,12 @@ public class TestTopicPublisher {
         topicPublisher1.publishAsync(msg1, new TopicSendCallback() {
             @Override
             public void onSuccess(TopicMessageSendResult topicMessageSendResult) {
-                log.info("ApacheRocketMq send success, topicMessageSendResult: {}", topicMessageSendResult.toString());
+                log.info("Ocean send success, topicMessageSendResult: {}", topicMessageSendResult.toString());
             }
 
             @Override
             public void onFail(TopicMQException topicMqException) {
-                log.error("ApacheRocketMq send fail", topicMqException);
+                log.error("Ocean send fail", topicMqException);
             }
         });
     }

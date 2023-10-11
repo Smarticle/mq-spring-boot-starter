@@ -10,11 +10,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.List;
 
 /**
- * RocketMQ配置
+ * Ocean配置
  */
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "cetc36.mq.rocketmq")
+@ConfigurationProperties(prefix = "cetc36.mq.ocean")
 public class ApacheRocketMQProperties extends BaseProperties {
     /**
      * mq 注册中心,服务地址
