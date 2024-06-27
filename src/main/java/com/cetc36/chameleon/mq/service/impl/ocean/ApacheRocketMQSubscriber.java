@@ -13,15 +13,14 @@ import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageExt;
 
-import java.util.Map;
-import java.util.Properties;
+import static com.cetc36.chameleon.mq.util.ApacheRocketMQUtil.convertToCETCMessage;
 
 /**
  * ApacheRocketMq 订阅消息
  */
 @Slf4j
 @SuppressWarnings("unused")
-public class SimpleOceanSubscriber implements TopicSubscriber {
+public class ApacheRocketMQSubscriber implements TopicSubscriber {
 
     /**
      * rocketMq消费服务
@@ -36,13 +35,13 @@ public class SimpleOceanSubscriber implements TopicSubscriber {
 
     ConsumeFailHandler consumeFailHandler;
 
-    public SimpleOceanSubscriber(DefaultMQPushConsumer consumer, ApacheMQSubProperties apacheMQSubProperties) {
+    public ApacheRocketMQSubscriber(DefaultMQPushConsumer consumer, ApacheMQSubProperties apacheMQSubProperties) {
         this.consumer = consumer;
         this.beanName = apacheMQSubProperties.getBeanName();
         this.apacheMQSubProperties = apacheMQSubProperties;
     }
 
-    public SimpleOceanSubscriber() {
+    public ApacheRocketMQSubscriber() {
     }
 
     @Override
@@ -50,7 +49,7 @@ public class SimpleOceanSubscriber implements TopicSubscriber {
         try {
             consumer.subscribe(topic, tagExpression);
         } catch (MQClientException e) {
-            log.error("【MQ】SimpleOceanSubscriber[" + beanName + "] start error", e);
+            log.error("【MQ】ApacheRocketMQSubscriber[" + beanName + "] start error", e);
             return;
         }
         // 注册回调实现类来处理从broker拉取回来的消息
@@ -58,19 +57,7 @@ public class SimpleOceanSubscriber implements TopicSubscriber {
             // 默认一次消费一条，批量消费支持可修改此处 messages.size() >= 1  DefaultMQPushConsumer.consumeMessageBatchMaxSize=1
             MessageExt messageExt = messages.get(0);
             // 转换成TopicMessage
-            TopicMessage topicMessage = new TopicMessage();
-            Map<String, String> RocketMQUserPropertiesMap = messageExt.getProperties();
-            if (RocketMQUserPropertiesMap != null && !RocketMQUserPropertiesMap.isEmpty()) {
-                Properties userProperties = new Properties();
-                userProperties.putAll(RocketMQUserPropertiesMap);
-                topicMessage.setUserProperties(userProperties);
-            }
-            topicMessage.setMessageId(messageExt.getMsgId());
-            topicMessage.setBizId(messageExt.getKeys());
-            topicMessage.setMessageBody(messageExt.getBody());
-            topicMessage.setTags(messageExt.getTags());
-            topicMessage.setTopicName(messageExt.getTopic());
-            topicMessage.setCurrentRetryConsumeCount(messageExt.getReconsumeTimes());
+            TopicMessage topicMessage = convertToCETCMessage(messageExt);
             // 回调此listener
             MessageStatus messageStatus = listener.consume(topicMessage);
             if (messageStatus.equals(MessageStatus.ConsumeSuccess)) {
@@ -119,18 +106,18 @@ public class SimpleOceanSubscriber implements TopicSubscriber {
 
     @Override
     public void start() {
-        log.info("【MQ】SimpleOceanSubscriber[" + beanName + "] start...");
+        log.info("【MQ】ApacheRocketMQSubscriber[" + beanName + "] start...");
         try {
             consumer.start();
             isStarted = true;
         } catch (MQClientException e) {
-            log.error("【MQ】SimpleOceanSubscriber[" + beanName + "] start error", e);
+            log.error("【MQ】ApacheRocketMQSubscriber[" + beanName + "] start error", e);
         }
     }
 
     @Override
     public void close() {
-        log.info("【MQ】SimpleOceanSubscriber[" + beanName + "] close...");
+        log.info("【MQ】ApacheRocketMQSubscriber[" + beanName + "] close...");
         consumer.shutdown();
     }
 

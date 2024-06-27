@@ -16,7 +16,7 @@ public class ApacheMQPubProperties {
     private String beanName;
 
     /**
-     * 生产者和消费者归属的组id, 一个微服务一个groupId 不能为空！！！
+     * 生产者和消费者归属的组id, 一个微服务一个groupId 不能为空！
      */
     private String groupId;
 

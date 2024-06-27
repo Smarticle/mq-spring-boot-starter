@@ -24,14 +24,14 @@ public interface TopicSubscriber extends Manage {
      *                      如果subExpression等于null或者*，则表示全部订阅
      * @param listener      消息回调监听器
      */
-    void subscribe(String topic, String tagExpression, TopicListener listener) throws IOException;
+    void subscribe(String topic, String tagExpression, TopicListener listener);
 
     /**
      * 取消某个topic订阅
      *
      * @param topicName 要取消的主题.
      */
-    void unsubscribe(String topicName) throws IOException;
+    void unsubscribe(String topicName);
 
     /**
      * 设置重试最大次数后失败的处理者

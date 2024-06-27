@@ -4,17 +4,22 @@ import com.cetc36.chameleon.mq.api.ConsumeFailHandler;
 import com.cetc36.chameleon.mq.api.TopicListener;
 import com.cetc36.chameleon.mq.api.TopicSubscriber;
 import com.cetc36.chameleon.mq.properties.rocketmq.ApacheRocketMQProperties;
-import com.cetc36.chameleon.mq.util.BeanArgBuilder;
-import com.cetc36.chameleon.mq.util.BeanRegisterUtil;
+import com.cetc36.chameleon.mq.properties.rocketmq.poller.ApacheMQPollProperties;
 import com.cetc36.chameleon.mq.properties.rocketmq.publisher.ApacheMQPubProperties;
 import com.cetc36.chameleon.mq.properties.rocketmq.subscriber.ApacheMQSubProperties;
 import com.cetc36.chameleon.mq.service.impl.DefaultConsumeFailHandler;
 import com.cetc36.chameleon.mq.service.impl.DefaultTopicListenerImpl;
-import com.cetc36.chameleon.mq.service.impl.ocean.SimpleOceanPublisher;
-import com.cetc36.chameleon.mq.service.impl.ocean.SimpleOceanSubscriber;
+import com.cetc36.chameleon.mq.service.impl.ocean.ApacheRocketMQPoller;
+import com.cetc36.chameleon.mq.service.impl.ocean.ApacheRocketMQPublisher;
+import com.cetc36.chameleon.mq.service.impl.ocean.ApacheRocketMQSubscriber;
+import com.cetc36.chameleon.mq.util.BeanArgBuilder;
+import com.cetc36.chameleon.mq.util.BeanRegisterUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.ClientConfig;
+import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
+import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.hook.SendMessageContext;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,7 +32,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -79,6 +83,8 @@ public class OceanMQAutoConfigure implements InitializingBean {
         topicPubService();
         // 订阅者
         topicSubService();
+        // 拉取者
+        topicPollService();
     }
 
     /**
@@ -95,6 +101,7 @@ public class OceanMQAutoConfigure implements InitializingBean {
                 (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
 
         for (ApacheMQPubProperties pubItem : properties) {
+            // TODO 校验配置
             DefaultMQProducer producer = new DefaultMQProducer(pubItem.getGroupId());
             // 公共配置
             setCommonConfig(producer);
@@ -119,7 +126,7 @@ public class OceanMQAutoConfigure implements InitializingBean {
             beanArgBuilder.setConstructorArgs(new Object[]{producer, pubItem.getBeanName()});
             beanArgBuilder.setInitMethodName("start");
             beanArgBuilder.setDestroyMethodName("close");
-            BeanRegisterUtil.registerBean(defaultListableBeanFactory, pubItem.getBeanName(), SimpleOceanPublisher.class, beanArgBuilder);
+            BeanRegisterUtil.registerBean(defaultListableBeanFactory, pubItem.getBeanName(), ApacheRocketMQPublisher.class, beanArgBuilder);
         }
     }
 
@@ -144,6 +151,7 @@ public class OceanMQAutoConfigure implements InitializingBean {
         Map<String, List<TopicListener>> listenerMapBySubBeanName = topicListenerGroupBySubBean(listenerMap);
 
         for (ApacheMQSubProperties subItem : properties) {
+            // TODO 校验配置
             DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(subItem.getGroupId());
             // 公共配置
             setCommonConfig(consumer);
@@ -154,8 +162,8 @@ public class OceanMQAutoConfigure implements InitializingBean {
             beanArgBuilder.setConstructorArgs(new Object[]{consumer, subItem});
             // start方法setListener后手动调用
             beanArgBuilder.setDestroyMethodName("close");
-            BeanRegisterUtil.registerBean(defaultListableBeanFactory, subItem.getBeanName(), SimpleOceanSubscriber.class, beanArgBuilder);
-            SimpleOceanSubscriber subscriber = applicationContext.getBean(subItem.getBeanName(), SimpleOceanSubscriber.class);
+            BeanRegisterUtil.registerBean(defaultListableBeanFactory, subItem.getBeanName(), ApacheRocketMQSubscriber.class, beanArgBuilder);
+            ApacheRocketMQSubscriber subscriber = applicationContext.getBean(subItem.getBeanName(), ApacheRocketMQSubscriber.class);
             setListener(subItem.getBeanName(), subscriber, consumeFailHandler, listenerMapBySubBeanName);
             // 启动
             subscriber.start();
@@ -163,10 +171,53 @@ public class OceanMQAutoConfigure implements InitializingBean {
     }
 
     /**
+     * 订阅服务注入容器
+     */
+    private void topicPollService() {
+        List<ApacheMQPollProperties> properties = apacheRocketMQProperties.getPollers();
+        if (properties == null || properties.isEmpty()) {
+            log.info("没有配置消息拉取者的属性, 不初始化消息拉取者对象");
+            return;
+        }
+        //获取BeanFactory
+        DefaultListableBeanFactory defaultListableBeanFactory =
+                (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
+
+        for (ApacheMQPollProperties pollItem : properties) {
+            // 校验配置
+            if (StringUtils.isBlank(pollItem.getTopicName()) || StringUtils.isBlank(pollItem.getTagExpression()) || StringUtils.isBlank(pollItem.getGroupId())) {
+                log.error("【MQ】ApacheRocketMQPoller pollItem必填字段为空");
+                continue;
+            }
+            DefaultLitePullConsumer poller = new DefaultLitePullConsumer(pollItem.getGroupId());
+            // 公共配置
+            setCommonConfig(poller);
+            // 订阅消息
+            try {
+                poller.subscribe(pollItem.getTopicName(), pollItem.getTagExpression());
+            } catch (MQClientException e) {
+                log.error("【MQ】ApacheRocketMQPoller[" + pollItem.getBeanName() + "] subscribe error", e);
+                return;
+            }
+            // 设置拉取数量
+            if (pollItem.getPullBatchSize() != null) {
+                poller.setPullBatchSize(pollItem.getPullBatchSize());
+            }
+            BeanArgBuilder beanArgBuilder = new BeanArgBuilder();
+            beanArgBuilder.setConstructorArgs(new Object[]{poller, pollItem.getBeanName()});
+            beanArgBuilder.setDestroyMethodName("close");
+            BeanRegisterUtil.registerBean(defaultListableBeanFactory, pollItem.getBeanName(), ApacheRocketMQPoller.class, beanArgBuilder);
+            ApacheRocketMQPoller pollerBean = applicationContext.getBean(pollItem.getBeanName(), ApacheRocketMQPoller.class);
+            // 启动
+            pollerBean.start();
+        }
+    }
+
+    /**
      * 公共配置
      */
     private void setCommonConfig(ClientConfig config) {
-        if (StringUtils.hasText(apacheRocketMQProperties.getClientIp())) {
+        if (StringUtils.isNotBlank(apacheRocketMQProperties.getClientIp())) {
             config.setClientIP(apacheRocketMQProperties.getClientIp());
         }
         if (apacheRocketMQProperties.getClientCallbackExecutorThreads() != null) {
@@ -181,6 +232,7 @@ public class OceanMQAutoConfigure implements InitializingBean {
         if (apacheRocketMQProperties.getPersistConsumerOffsetInterval() != null) {
             config.setPersistConsumerOffsetInterval(apacheRocketMQProperties.getPersistConsumerOffsetInterval());
         }
+        // TODO 校验
         config.setNamesrvAddr(apacheRocketMQProperties.getNameServerAddr());
     }
 

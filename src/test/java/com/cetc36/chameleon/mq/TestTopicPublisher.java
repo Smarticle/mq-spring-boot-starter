@@ -30,7 +30,7 @@ public class TestTopicPublisher {
         assertFalse(topicPublisher1.isClosed());
         // 构建消息体
         TopicMessage msg1 = new TopicMessage();
-        msg1.setTopicName("PAY_ORDER");
+        msg1.setTopicName("PAY_ORDER1");
         // 模拟创建订单消息
         msg1.setTags("CREATE");
         msg1.setBizId(System.currentTimeMillis() + "");

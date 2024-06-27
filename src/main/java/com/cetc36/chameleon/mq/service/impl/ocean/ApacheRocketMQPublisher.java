@@ -5,6 +5,7 @@ import com.cetc36.chameleon.mq.api.TopicSendCallback;
 import com.cetc36.chameleon.mq.exception.TopicMQException;
 import com.cetc36.chameleon.mq.model.TopicMessage;
 import com.cetc36.chameleon.mq.model.TopicMessageSendResult;
+import com.cetc36.chameleon.mq.util.ApacheRocketMQUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ import org.apache.rocketmq.common.message.Message;
 @Setter
 @Slf4j
 @SuppressWarnings("unused")
-public class SimpleOceanPublisher implements TopicPublisher {
+public class ApacheRocketMQPublisher implements TopicPublisher {
 
     /**
      * apache rocketmq producer
@@ -36,22 +37,25 @@ public class SimpleOceanPublisher implements TopicPublisher {
 
     boolean isStarted;
 
-    public SimpleOceanPublisher(DefaultMQProducer producer, String beanName) {
+    public ApacheRocketMQPublisher(DefaultMQProducer producer, String beanName) {
         this.producer = producer;
         this.beanName = beanName;
     }
 
-    public SimpleOceanPublisher() {
+    public ApacheRocketMQPublisher() {
     }
 
     @Override
     public TopicMessageSendResult publish(TopicMessage topicMessage) {
-        Message message = converRocketMessage(topicMessage);
+        if (topicMessage == null) {
+            throw new TopicMQException("ApacheRocketMQ TopicMessage为空，无法发送！");
+        }
+        Message message = ApacheRocketMQUtil.converToRocketMessage(topicMessage);
         SendResult sendResult;
         try {
             sendResult = producer.send(message);
         } catch (Exception e) {
-            TopicMQException topicMqException = new TopicMQException("ApacheRocketMq keys =" + message.getKeys()
+            TopicMQException topicMqException = new TopicMQException("ApacheRocketMQ keys =" + message.getKeys()
                     + " 发送异常 ", message.getTopic(), e);
             topicMqException.setMessageId(topicMessage.getMessageId());
             topicMqException.setTag(topicMessage.getTags());
@@ -59,7 +63,7 @@ public class SimpleOceanPublisher implements TopicPublisher {
             throw topicMqException;
         }
         if (!sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
-            TopicMQException topicMqException = new TopicMQException("ApacheRocketMq keys =" + message.getKeys()
+            TopicMQException topicMqException = new TopicMQException("ApacheRocketMQ keys =" + message.getKeys()
                     + "发送异常 " + sendResult.getSendStatus().toString(), message.getTopic());
             topicMqException.setMessageId(sendResult.getMsgId());
             topicMqException.setTag(topicMessage.getTags());
@@ -76,24 +80,12 @@ public class SimpleOceanPublisher implements TopicPublisher {
         return topicMessageSendResult;
     }
 
-    /**
-     * RocketMQ消息适配
-     */
-    static Message converRocketMessage(TopicMessage topicMessage) {
-        Message message = new Message();
-        if (topicMessage.getUserProperties() != null) {
-            topicMessage.getUserProperties().forEach((k, v) -> message.putUserProperty(k.toString(), v.toString()));
-        }
-        message.setKeys(topicMessage.getBizId());
-        message.setBody(topicMessage.getMessageBody());
-        message.setTags(topicMessage.getTags());
-        message.setTopic(topicMessage.getTopicName());
-        return message;
-    }
-
     @Override
     public void publishAsync(TopicMessage topicMessage, TopicSendCallback topicSendCallback) {
-        Message message = converRocketMessage(topicMessage);
+        if (topicMessage == null) {
+            throw new TopicMQException("ApacheRocketMQ TopicMessage为空，无法发送！");
+        }
+        Message message = ApacheRocketMQUtil.converToRocketMessage(topicMessage);
         try {
             producer.send(message, new SendCallback() {
                 @Override

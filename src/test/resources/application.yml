@@ -7,3 +7,6 @@ cetc36:
         - { beanName: publishService1, groupId: group1, sendMsgTimeoutMillis: 5000 }
       subscribers:
         - { beanName: subscriberService1, groupId: group1, maxRetryCount: 1 }
+      pollers:
+        - { beanName: pollerService1, groupId: group1, topicName: PAY_ORDER, tagExpression: "*"}
+        - { beanName: pollerService2, groupId: group1, topicName: PAY_ORDER1, tagExpression: "*"}
