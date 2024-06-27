@@ -1,9 +1,9 @@
 package com.cetc36.chameleon.mq.properties.rocketmq;
 
 import com.cetc36.chameleon.mq.properties.BaseProperties;
-import com.cetc36.chameleon.mq.properties.rocketmq.poller.ApacheMQPollProperties;
-import com.cetc36.chameleon.mq.properties.rocketmq.publisher.ApacheMQPubProperties;
-import com.cetc36.chameleon.mq.properties.rocketmq.subscriber.ApacheMQSubProperties;
+import com.cetc36.chameleon.mq.properties.rocketmq.poller.ApacheRocketMQPollProperties;
+import com.cetc36.chameleon.mq.properties.rocketmq.publisher.ApacherRocketMQPubProperties;
+import com.cetc36.chameleon.mq.properties.rocketmq.subscriber.ApacheRocketMQSubProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -51,16 +51,16 @@ public class ApacheRocketMQProperties extends BaseProperties {
     /**
      * 消息生产者
      */
-    private List<ApacheMQPubProperties> publishers;
+    private List<ApacherRocketMQPubProperties> publishers;
 
     /**
      * 消息订阅者
      */
-    private List<ApacheMQSubProperties> subscribers;
+    private List<ApacheRocketMQSubProperties> subscribers;
 
     /**
      * 消息拉取者
      */
-    private List<ApacheMQPollProperties> pollers;
+    private List<ApacheRocketMQPollProperties> pollers;
 
 }

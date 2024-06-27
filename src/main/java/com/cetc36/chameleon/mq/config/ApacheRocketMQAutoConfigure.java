@@ -2,11 +2,12 @@ package com.cetc36.chameleon.mq.config;
 
 import com.cetc36.chameleon.mq.api.ConsumeFailHandler;
 import com.cetc36.chameleon.mq.api.TopicListener;
+import com.cetc36.chameleon.mq.api.TopicPoller;
 import com.cetc36.chameleon.mq.api.TopicSubscriber;
 import com.cetc36.chameleon.mq.properties.rocketmq.ApacheRocketMQProperties;
-import com.cetc36.chameleon.mq.properties.rocketmq.poller.ApacheMQPollProperties;
-import com.cetc36.chameleon.mq.properties.rocketmq.publisher.ApacheMQPubProperties;
-import com.cetc36.chameleon.mq.properties.rocketmq.subscriber.ApacheMQSubProperties;
+import com.cetc36.chameleon.mq.properties.rocketmq.poller.ApacheRocketMQPollProperties;
+import com.cetc36.chameleon.mq.properties.rocketmq.publisher.ApacherRocketMQPubProperties;
+import com.cetc36.chameleon.mq.properties.rocketmq.subscriber.ApacheRocketMQSubProperties;
 import com.cetc36.chameleon.mq.service.impl.DefaultConsumeFailHandler;
 import com.cetc36.chameleon.mq.service.impl.DefaultTopicListenerImpl;
 import com.cetc36.chameleon.mq.service.impl.ocean.ApacheRocketMQPoller;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.cetc36.chameleon.mq.config.ApacheRocketMQTopicPollerFactory.generateTopicPollerKey;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
@@ -51,7 +53,7 @@ import static java.util.stream.Collectors.groupingBy;
 @ConditionalOnClass({SendMessageContext.class})
 @ConditionalOnProperty(prefix = "cetc36.mq.ocean", value = "enable", havingValue = "true")
 @EnableConfigurationProperties({ApacheRocketMQProperties.class})
-public class OceanMQAutoConfigure implements InitializingBean {
+public class ApacheRocketMQAutoConfigure implements InitializingBean {
 
     @Autowired
     private ApacheRocketMQProperties apacheRocketMQProperties;
@@ -64,6 +66,11 @@ public class OceanMQAutoConfigure implements InitializingBean {
      */
     @Autowired
     private Map<String, TopicListener> listenerMap = new ConcurrentHashMap<>(4);
+
+    /**
+     * TopicPollerMap，Key为TopicName_TagExpression
+     */
+    private static Map<String, TopicPoller> topicPollerMap = new ConcurrentHashMap<>(4);
 
     @Bean
     @ConditionalOnMissingBean
@@ -84,23 +91,21 @@ public class OceanMQAutoConfigure implements InitializingBean {
         // 订阅者
         topicSubService();
         // 拉取者
-        topicPollService();
+         topicPollService();
     }
 
     /**
      * 发布服务注入容器
      */
     private void topicPubService() {
-        List<ApacheMQPubProperties> properties = apacheRocketMQProperties.getPublishers();
+        List<ApacherRocketMQPubProperties> properties = apacheRocketMQProperties.getPublishers();
         if (properties == null || properties.isEmpty()) {
             log.info("没有配置消息发布者的属性, 不初始化消息发布者对象");
             return;
         }
 
-        DefaultListableBeanFactory defaultListableBeanFactory =
-                (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
-
-        for (ApacheMQPubProperties pubItem : properties) {
+        DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
+        for (ApacherRocketMQPubProperties pubItem : properties) {
             // TODO 校验配置
             DefaultMQProducer producer = new DefaultMQProducer(pubItem.getGroupId());
             // 公共配置
@@ -138,19 +143,17 @@ public class OceanMQAutoConfigure implements InitializingBean {
             log.info("没有消息监听者service对象, 不初始化消息消费者对象");
             return;
         }
-
-        List<ApacheMQSubProperties> properties = apacheRocketMQProperties.getSubscribers();
+        List<ApacheRocketMQSubProperties> properties = apacheRocketMQProperties.getSubscribers();
         if (properties == null || properties.isEmpty()) {
             log.info("没有配置消息消息者的属性, 不初始化消息消费者对象");
             return;
         }
         //获取BeanFactory
-        DefaultListableBeanFactory defaultListableBeanFactory =
-                (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
+        DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
         ConsumeFailHandler consumeFailHandler = applicationContext.getBean(ConsumeFailHandler.class);
         Map<String, List<TopicListener>> listenerMapBySubBeanName = topicListenerGroupBySubBean(listenerMap);
 
-        for (ApacheMQSubProperties subItem : properties) {
+        for (ApacheRocketMQSubProperties subItem : properties) {
             // TODO 校验配置
             DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(subItem.getGroupId());
             // 公共配置
@@ -174,19 +177,23 @@ public class OceanMQAutoConfigure implements InitializingBean {
      * 订阅服务注入容器
      */
     private void topicPollService() {
-        List<ApacheMQPollProperties> properties = apacheRocketMQProperties.getPollers();
+        List<ApacheRocketMQPollProperties> properties = apacheRocketMQProperties.getPollers();
         if (properties == null || properties.isEmpty()) {
             log.info("没有配置消息拉取者的属性, 不初始化消息拉取者对象");
             return;
         }
         //获取BeanFactory
-        DefaultListableBeanFactory defaultListableBeanFactory =
-                (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
+        DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
 
-        for (ApacheMQPollProperties pollItem : properties) {
+        for (ApacheRocketMQPollProperties pollItem : properties) {
             // 校验配置
             if (StringUtils.isBlank(pollItem.getTopicName()) || StringUtils.isBlank(pollItem.getTagExpression()) || StringUtils.isBlank(pollItem.getGroupId())) {
                 log.error("【MQ】ApacheRocketMQPoller pollItem必填字段为空");
+                continue;
+            }
+            String key = generateTopicPollerKey(pollItem.getGroupId(), pollItem.getTopicName(), pollItem.getTagExpression());
+            if (topicPollerMap.containsKey(key)) {
+                log.error("【MQ】ApacheRocketMQPoller topicPollerMap" + key + "已存在");
                 continue;
             }
             DefaultLitePullConsumer poller = new DefaultLitePullConsumer(pollItem.getGroupId());
@@ -210,6 +217,7 @@ public class OceanMQAutoConfigure implements InitializingBean {
             ApacheRocketMQPoller pollerBean = applicationContext.getBean(pollItem.getBeanName(), ApacheRocketMQPoller.class);
             // 启动
             pollerBean.start();
+            topicPollerMap.put(key, pollerBean);
         }
     }
 
@@ -244,11 +252,7 @@ public class OceanMQAutoConfigure implements InitializingBean {
      * @param listenerMapBySubBeanName ignore
      * @param consumeFailHandler       ignore
      */
-    private void setListener(
-            String subscriberBeanName,
-            TopicSubscriber subscriber,
-            ConsumeFailHandler consumeFailHandler,
-            Map<String, List<TopicListener>> listenerMapBySubBeanName) throws IOException {
+    private void setListener(String subscriberBeanName, TopicSubscriber subscriber, ConsumeFailHandler consumeFailHandler, Map<String, List<TopicListener>> listenerMapBySubBeanName) throws IOException {
 
         List<TopicListener> listeners = listenerMapBySubBeanName.get(subscriberBeanName);
         if (listeners == null || listeners.isEmpty()) {

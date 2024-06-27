@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-                    com.cetc36.chameleon.mq.config.OceanMQAutoConfigure
+                    com.cetc36.chameleon.mq.config.ApacheRocketMQAutoConfigure

@@ -5,7 +5,7 @@ import com.cetc36.chameleon.mq.api.TopicListener;
 import com.cetc36.chameleon.mq.api.TopicSubscriber;
 import com.cetc36.chameleon.mq.model.MessageStatus;
 import com.cetc36.chameleon.mq.model.TopicMessage;
-import com.cetc36.chameleon.mq.properties.rocketmq.subscriber.ApacheMQSubProperties;
+import com.cetc36.chameleon.mq.properties.rocketmq.subscriber.ApacheRocketMQSubProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -31,14 +31,14 @@ public class ApacheRocketMQSubscriber implements TopicSubscriber {
 
     boolean isStarted;
 
-    ApacheMQSubProperties apacheMQSubProperties;
+    ApacheRocketMQSubProperties apacheRocketMQSubProperties;
 
     ConsumeFailHandler consumeFailHandler;
 
-    public ApacheRocketMQSubscriber(DefaultMQPushConsumer consumer, ApacheMQSubProperties apacheMQSubProperties) {
+    public ApacheRocketMQSubscriber(DefaultMQPushConsumer consumer, ApacheRocketMQSubProperties apacheRocketMQSubProperties) {
         this.consumer = consumer;
-        this.beanName = apacheMQSubProperties.getBeanName();
-        this.apacheMQSubProperties = apacheMQSubProperties;
+        this.beanName = apacheRocketMQSubProperties.getBeanName();
+        this.apacheRocketMQSubProperties = apacheRocketMQSubProperties;
     }
 
     public ApacheRocketMQSubscriber() {
@@ -75,16 +75,16 @@ public class ApacheRocketMQSubscriber implements TopicSubscriber {
     protected ConsumeConcurrentlyStatus failureFrequency(TopicMessage topicMessage) {
         // String messageUniqueId = topicMessage.getTopicName() + "_" + topicMessage.getTags() + "_" + topicMessage.getMessageId();
         int retryCnt = topicMessage.getCurrentRetryConsumeCount();
-        if (retryCnt >= apacheMQSubProperties.getMaxRetryCount()) {
+        if (retryCnt >= apacheRocketMQSubProperties.getMaxRetryCount()) {
             log.info("消息超过最大重新投递次数{} ，直接消费完成！ topicName={}, messageId={}, bizId={}, routingKey={}, groupId={}",
-                    apacheMQSubProperties.getMaxRetryCount(), topicMessage.getTopicName(),
-                    topicMessage.getMessageId(), topicMessage.getBizId(), topicMessage.getTags(), apacheMQSubProperties.getGroupId());
+                    apacheRocketMQSubProperties.getMaxRetryCount(), topicMessage.getTopicName(),
+                    topicMessage.getMessageId(), topicMessage.getBizId(), topicMessage.getTags(), apacheRocketMQSubProperties.getGroupId());
             consumeFailHandler.handle(topicMessage);
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         } else {
             log.info("消息重新投递.... topicName={}, messageId={}, bizId={}, routingKey={}, groupId={}",
                     topicMessage.getTopicName(), topicMessage.getMessageId(), topicMessage.getBizId(),
-                    topicMessage.getTags(), apacheMQSubProperties.getGroupId());
+                    topicMessage.getTags(), apacheRocketMQSubProperties.getGroupId());
             return ConsumeConcurrentlyStatus.RECONSUME_LATER;
         }
     }

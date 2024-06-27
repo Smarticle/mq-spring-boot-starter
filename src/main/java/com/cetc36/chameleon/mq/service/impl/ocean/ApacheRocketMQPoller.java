@@ -43,6 +43,15 @@ public class ApacheRocketMQPoller implements TopicPoller {
 
 
     @Override
+    public List<TopicMessage> poll() {
+        // 拉取消息
+        List<MessageExt> messages = poller.poll();
+        // 转换成TopicMessage
+        return ApacheRocketMQUtil.convertToCETCMessageList(messages);
+    }
+
+
+    @Override
     public List<TopicMessage> poll(long timeout) {
         // 拉取消息
         List<MessageExt> messages = poller.poll(timeout);

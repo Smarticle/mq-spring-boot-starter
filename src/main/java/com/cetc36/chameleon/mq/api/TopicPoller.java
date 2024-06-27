@@ -14,9 +14,14 @@ import java.util.List;
  */
 public interface TopicPoller extends Manage {
 
+    /**
+     * 拉取消息
+     * 默认超时5s
+     */
+    List<TopicMessage> poll();
 
     /**
-     * 订阅消息
+     * 拉取消息
      *
      * @param timeout 超时时间
      */
@@ -27,7 +32,6 @@ public interface TopicPoller extends Manage {
      * 提交
      */
     void commit();
-
 
 }
 

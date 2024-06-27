@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ApacheMQPubProperties {
+public class ApacherRocketMQPubProperties {
 
     /**
      * 消息生产者在spring中的beanName

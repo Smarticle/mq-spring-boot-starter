@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public class ApacheMQPollProperties extends BaseSubProperties {
+public class ApacheRocketMQPollProperties extends BaseSubProperties {
 
     /**
      * 消息消费者在spring中的beanName
