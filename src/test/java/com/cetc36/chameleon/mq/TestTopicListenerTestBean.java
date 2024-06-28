@@ -17,7 +17,7 @@ public class TestTopicListenerTestBean implements TopicListener {
 
     @Override
     public String getTopicName() {
-        return "PAY_ORDER";
+        return "PAY_ORDER1111";
     }
 
     @Override

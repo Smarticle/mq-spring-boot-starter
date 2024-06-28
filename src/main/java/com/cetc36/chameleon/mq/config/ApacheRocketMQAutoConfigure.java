@@ -1,9 +1,6 @@
 package com.cetc36.chameleon.mq.config;
 
-import com.cetc36.chameleon.mq.api.ConsumeFailHandler;
-import com.cetc36.chameleon.mq.api.TopicListener;
-import com.cetc36.chameleon.mq.api.TopicPoller;
-import com.cetc36.chameleon.mq.api.TopicSubscriber;
+import com.cetc36.chameleon.mq.api.*;
 import com.cetc36.chameleon.mq.properties.rocketmq.ApacheRocketMQProperties;
 import com.cetc36.chameleon.mq.properties.rocketmq.poller.ApacheRocketMQPollProperties;
 import com.cetc36.chameleon.mq.properties.rocketmq.publisher.ApacherRocketMQPubProperties;
@@ -41,6 +38,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.cetc36.chameleon.mq.config.ApacheRocketMQTopicPollerFactory.generateTopicPollerKey;
+import static com.cetc36.chameleon.mq.config.ApacheRocketMQTopicPollerFactory.topicPollerMap;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
@@ -67,11 +65,6 @@ public class ApacheRocketMQAutoConfigure implements InitializingBean {
     @Autowired
     private Map<String, TopicListener> listenerMap = new ConcurrentHashMap<>(4);
 
-    /**
-     * TopicPollerMap，Key为TopicName_TagExpression
-     */
-    private static Map<String, TopicPoller> topicPollerMap = new ConcurrentHashMap<>(4);
-
     @Bean
     @ConditionalOnMissingBean
     public ConsumeFailHandler defaultRetryConsumeFailHandler() {
@@ -91,7 +84,9 @@ public class ApacheRocketMQAutoConfigure implements InitializingBean {
         // 订阅者
         topicSubService();
         // 拉取者
-         topicPollService();
+        topicPollService();
+        // 注册topicPollerFactory
+        topicPollerFactoryRegister();
     }
 
     /**
@@ -219,6 +214,16 @@ public class ApacheRocketMQAutoConfigure implements InitializingBean {
             pollerBean.start();
             topicPollerMap.put(key, pollerBean);
         }
+    }
+
+    /**
+     * 订阅服务注入容器
+     */
+    private void topicPollerFactoryRegister() {
+        DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
+        BeanArgBuilder beanArgBuilder = new BeanArgBuilder();
+        beanArgBuilder.setConstructorArgs(new Object[]{apacheRocketMQProperties, applicationContext});
+        BeanRegisterUtil.registerBean(defaultListableBeanFactory, TopicPollerFactory.class.getName(), ApacheRocketMQTopicPollerFactory.class, beanArgBuilder);
     }
 
     /**

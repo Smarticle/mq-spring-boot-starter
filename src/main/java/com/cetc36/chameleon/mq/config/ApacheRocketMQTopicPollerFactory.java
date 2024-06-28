@@ -11,29 +11,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.ClientConfig;
 import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
 import org.apache.rocketmq.client.exception.MQClientException;
-import org.apache.rocketmq.client.hook.SendMessageContext;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-@Component
-@ConditionalOnClass({SendMessageContext.class})
-@ConditionalOnProperty(prefix = "cetc36.mq.ocean", value = "enable", havingValue = "true")
-@EnableConfigurationProperties({ApacheRocketMQProperties.class})
-public class ApacheRocketMQTopicPollerFactory implements ApplicationContextAware, TopicPollerFactory {
+public class ApacheRocketMQTopicPollerFactory implements TopicPollerFactory {
 
-    @Autowired
-    private ApacheRocketMQProperties apacheRocketMQProperties;
+    private final ApacheRocketMQProperties apacheRocketMQProperties;
 
     private ApplicationContext applicationContext;
 
@@ -41,6 +28,12 @@ public class ApacheRocketMQTopicPollerFactory implements ApplicationContextAware
      * 拉取者Map
      */
     public static Map<String, TopicPoller> topicPollerMap = new ConcurrentHashMap<>();
+
+    public ApacheRocketMQTopicPollerFactory(ApacheRocketMQProperties apacheRocketMQProperties, ApplicationContext applicationContext) {
+        this.apacheRocketMQProperties = apacheRocketMQProperties;
+        this.applicationContext = applicationContext;
+    }
+
 
     public static String generateTopicPollerKey(String groupId, String topicName, String tagExpression) {
         return groupId + "_liu_" + topicName + "_yang_" + tagExpression;
@@ -52,6 +45,7 @@ public class ApacheRocketMQTopicPollerFactory implements ApplicationContextAware
     public TopicPoller create(String groupId, String topicName, String tagExpression, int pullBatchSize) {
         String key = generateTopicPollerKey(groupId, topicName, tagExpression);
         if (topicPollerMap.containsKey(key)) {
+            // TODO 重新设置其他参数
             return topicPollerMap.get(key);
         }
         DefaultLitePullConsumer poller = new DefaultLitePullConsumer(groupId);
@@ -59,7 +53,7 @@ public class ApacheRocketMQTopicPollerFactory implements ApplicationContextAware
         setCommonConfig(poller);
         // 订阅消息
         try {
-            poller.subscribe(topicName, tagExpression);
+            poller.subscribe(topicName);
         } catch (MQClientException e) {
             log.error("【MQ】ApacheRocketMQPoller[" + topicName + tagExpression + "] subscribe error", e);
             return null;
@@ -102,8 +96,4 @@ public class ApacheRocketMQTopicPollerFactory implements ApplicationContextAware
         config.setNamesrvAddr(apacheRocketMQProperties.getNameServerAddr());
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
 }
